@@ -5,4 +5,4 @@ before_install:
   - docker build -t niicloudoperation/notebook .
 
 script:
-  - docker run niicloudoperation/notebook papermill '/notebooks/99_Test python3 env.ipynb' /tmp/Result.ipynb
+  - find ./sample-notebooks -name '*.ipynb' | xargs -INOTEBOOK docker run niicloudoperation/notebook papermill '/notebooks/NOTEBOOK' /tmp/Result.ipynb
