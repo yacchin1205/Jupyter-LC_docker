@@ -10,3 +10,14 @@ if 'PASSWORD' in os.environ:
     from notebook.auth import passwd
     c.NotebookApp.password = passwd(os.environ['PASSWORD'])
     del os.environ['PASSWORD']
+
+ipython_startup = os.path.expanduser('~/.ipython/profile_default/startup/'
+                                     '10-custom-get_ipython_system.py')
+if not os.path.exists(ipython_startup):
+    import shutil
+    parent, _ = os.path.split(ipython_startup)
+    if not os.path.exists(parent):
+        os.makedirs(parent)
+    shutil.copy('/etc/ipython/profile_default/startup/'
+                '10-custom-get_ipython_system.py',
+                ipython_startup)

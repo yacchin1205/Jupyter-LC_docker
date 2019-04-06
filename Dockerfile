@@ -85,12 +85,10 @@ RUN pip --no-cache-dir install jupyter && \
 
 # Copy config files
 ADD conf /tmp/
-USER $NB_USER
-RUN mkdir -p $HOME/.jupyter && \
+RUN mkdir -p /etc/jupyter && \
     cp -f /tmp/jupyter_notebook_config.py \
-       $HOME/.jupyter/jupyter_notebook_config.py
+       /etc/jupyter/jupyter_notebook_config.py
 
-USER root
 SHELL ["/bin/bash", "-c"]
 
 ### ansible
@@ -129,25 +127,21 @@ RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     git+https://github.com/NII-cloud-operation/Jupyter-LC_index.git \
     git+https://github.com/NII-cloud-operation/Jupyter-LC_notebook_diff.git
 
-
-USER $NB_USER
-RUN mkdir -p $HOME/.local/share && \
-    jupyter contrib nbextension install --user && \
-    jupyter nblineage quick-setup --user && \
-    jupyter run-through quick-setup --user && \
-    jupyter nbextension install --py lc_multi_outputs --user && \
-    jupyter nbextension enable --py lc_multi_outputs --user && \
-    jupyter nbextension install --py notebook_index --user && \
-    jupyter nbextension enable --py notebook_index --user && \
-    jupyter nbextension install --py lc_wrapper --user && \
-    jupyter nbextension enable --py lc_wrapper --user && \
-    jupyter nbextension install --py lc_notebook_diff --user && \
-    python -m bash_kernel.install --user && \
-    jupyter kernelspec install /tmp/kernels/python3-wrapper --user && \
-    jupyter kernelspec install /tmp/kernels/bash-wrapper --user
+RUN jupyter contrib nbextension install && \
+    jupyter nblineage quick-setup && \
+    jupyter run-through quick-setup && \
+    jupyter nbextension install --py lc_multi_outputs && \
+    jupyter nbextension enable --py lc_multi_outputs && \
+    jupyter nbextension install --py notebook_index && \
+    jupyter nbextension enable --py notebook_index && \
+    jupyter nbextension install --py lc_wrapper && \
+    jupyter nbextension enable --py lc_wrapper && \
+    jupyter nbextension install --py lc_notebook_diff && \
+    python -m bash_kernel.install && \
+    jupyter kernelspec install /tmp/kernels/python3-wrapper && \
+    jupyter kernelspec install /tmp/kernels/bash-wrapper
 
 ### notebooks dir
-USER root
 RUN mkdir -p /notebooks
 ADD sample-notebooks /notebooks
 RUN chown $NB_USER:users -R /notebooks
@@ -161,26 +155,27 @@ RUN cp /tmp/bash_env /etc/bash_env
 ENV BASH_ENV=/etc/bash_env
 
 ### nbconfig
-USER $NB_USER
-RUN mkdir -p $HOME/.jupyter/nbconfig && \
-    cp /tmp/notebook.json $HOME/.jupyter/nbconfig/notebook.json
+RUN mkdir -p /etc/jupyter/nbconfig && \
+    cp /tmp/notebook.json /etc/jupyter/nbconfig/notebook.json
 
 ### Theme for jupyter
-RUN mkdir -p $HOME/.jupyter/custom/ && \
-    cp /tmp/custom.css $HOME/.jupyter/custom/custom.css && \
-    cp /tmp/logo.png $HOME/.jupyter/custom/logo.png && \
-    mkdir -p $HOME/.jupyter/custom/codemirror/addon/merge/ && \
-    curl -fL https://raw.githubusercontent.com/cytoscape/cytoscape.js/master/dist/cytoscape.min.js > $HOME/.jupyter/custom/cytoscape.min.js && \
-    curl -fL https://raw.githubusercontent.com/iVis-at-Bilkent/cytoscape.js-view-utilities/master/cytoscape-view-utilities.js > $HOME/.jupyter/custom/cytoscape-view-utilities.js && \
-    curl -fL https://raw.githubusercontent.com/NII-cloud-operation/Jupyter-LC_notebook_diff/master/html/jupyter-notebook-diff.js > $HOME/.jupyter/custom/jupyter-notebook-diff.js && \
-    curl -fL https://raw.githubusercontent.com/NII-cloud-operation/Jupyter-LC_notebook_diff/master/html/jupyter-notebook-diff.css > $HOME/.jupyter/custom/jupyter-notebook-diff.css && \
-    curl -fL https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js > $HOME/.jupyter/custom/diff_match_patch.js && \
-    curl -fL https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.35.0/addon/merge/merge.js > $HOME/.jupyter/custom/codemirror/addon/merge/merge.js && \
-    curl -fL https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.35.0/addon/merge/merge.min.css > $HOME/.jupyter/custom/merge.min.css
+ENV CUSTOM_DIR=$CONDA3_DIR/lib/python3.7/site-packages/notebook/static/custom
+RUN mkdir -p $CUSTOM_DIR && \
+    cp /tmp/custom.css $CUSTOM_DIR/custom.css && \
+    cp /tmp/logo.png $CUSTOM_DIR/logo.png && \
+    mkdir -p $CUSTOM_DIR/codemirror/addon/merge/ && \
+    curl -fL https://raw.githubusercontent.com/cytoscape/cytoscape.js/master/dist/cytoscape.min.js > $CUSTOM_DIR/cytoscape.min.js && \
+    curl -fL https://raw.githubusercontent.com/iVis-at-Bilkent/cytoscape.js-view-utilities/master/cytoscape-view-utilities.js > $CUSTOM_DIR/cytoscape-view-utilities.js && \
+    curl -fL https://raw.githubusercontent.com/NII-cloud-operation/Jupyter-LC_notebook_diff/master/html/jupyter-notebook-diff.js > $CUSTOM_DIR/jupyter-notebook-diff.js && \
+    curl -fL https://raw.githubusercontent.com/NII-cloud-operation/Jupyter-LC_notebook_diff/master/html/jupyter-notebook-diff.css > $CUSTOM_DIR/jupyter-notebook-diff.css && \
+    curl -fL https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js > $CUSTOM_DIR/diff_match_patch.js && \
+    curl -fL https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.35.0/addon/merge/merge.js > $CUSTOM_DIR/codemirror/addon/merge/merge.js && \
+    curl -fL https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.35.0/addon/merge/merge.min.css > $CUSTOM_DIR/merge.min.css
 
 ### Custom get_ipython().system() to control error propagation of shell commands
-RUN mkdir -p $HOME/.ipython/profile_default/startup && \
-    cp /tmp/10-custom-get_ipython_system.py $HOME/.ipython/profile_default/startup/
+RUN mkdir -p /etc/ipython/profile_default/startup && \
+    cp /tmp/10-custom-get_ipython_system.py /etc/ipython/profile_default/startup/
+USER $NB_USER
 
 ENV SHELL=/bin/bash
 ENTRYPOINT ["tini", "--"]
