@@ -156,7 +156,8 @@ ENV BASH_ENV=/etc/bash_env
 
 ### nbconfig
 RUN mkdir -p /etc/jupyter/nbconfig && \
-    cp /tmp/notebook.json /etc/jupyter/nbconfig/notebook.json
+    cp /tmp/notebook.json /etc/jupyter/nbconfig/notebook.json && \
+    cp /tmp/tree.json /etc/jupyter/nbconfig/tree.json
 
 ### Theme for jupyter
 ENV CUSTOM_DIR=$CONDA3_DIR/lib/python3.7/site-packages/notebook/static/custom
