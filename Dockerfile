@@ -160,7 +160,7 @@ RUN mkdir -p /etc/jupyter/nbconfig && \
     cp /tmp/tree.json /etc/jupyter/nbconfig/tree.json
 
 ### Theme for jupyter
-ENV CUSTOM_DIR=$CONDA3_DIR/lib/python3.7/site-packages/notebook/static/custom
+ENV CUSTOM_DIR=$CONDA3_DIR/lib/python3.6/site-packages/notebook/static/custom
 RUN mkdir -p $CUSTOM_DIR && \
     cp /tmp/custom.css $CUSTOM_DIR/custom.css && \
     cp /tmp/logo.png $CUSTOM_DIR/logo.png && \
