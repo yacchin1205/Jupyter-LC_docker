@@ -125,4 +125,5 @@ RUN mkdir -p /usr/local/bin/before-notebook.d && \
 
 USER $NB_USER
 
+USER root
 ENV GRANT_SUDO yes
