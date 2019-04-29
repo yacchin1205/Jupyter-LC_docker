@@ -124,3 +124,5 @@ RUN mkdir -p /usr/local/bin/before-notebook.d && \
     cp /tmp/ssh-agent.sh /usr/local/bin/before-notebook.d/
 
 USER $NB_USER
+
+ENV GRANT_SUDO yes
