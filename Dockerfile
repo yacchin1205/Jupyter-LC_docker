@@ -1,3 +1,5 @@
+FROM solr:latest AS solr
+
 FROM jupyter/scipy-notebook:latest
 MAINTAINER https://github.com/NII-cloud-operation
 
@@ -69,7 +71,7 @@ RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     git+https://github.com/NII-cloud-operation/Jupyter-LC_index.git \
     git+https://github.com/NII-cloud-operation/Jupyter-LC_notebook_diff.git \
     git+https://github.com/NII-cloud-operation/sidestickies.git \
-    git+https://github.com/NII-cloud-operation/nbsearch.git
+    git+https://github.com/yacchin1205/nbsearch.git@feature/solr-r1
 
 
 RUN jupyter contrib nbextension install --sys-prefix && \
@@ -132,29 +134,45 @@ RUN mkdir -p $CONDA_DIR/etc/ipython/startup/ && \
 RUN mkdir -p /usr/local/bin/before-notebook.d && \
     cp /tmp/ssh-agent.sh /usr/local/bin/before-notebook.d/
 
-### Install MongoDB and lsyncd for nbsearch
-### based on https://github.com/docker-library/mongo/tree/master/4.4
-ENV MONGO_MAJOR 4.4
-ENV MONGO_VERSION 4.4.5
-RUN apt-get update && apt-get install -yq lsyncd uuid-runtime gnupg curl \
-    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 20691EEC35216C63CAF66CE1656408E390CFB1F5 \
-    && echo "deb http://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${MONGO_MAJOR} multiverse" | tee /etc/apt/sources.list.d/mongodb-org.list \
-    && apt-get update && apt-get install -y \
-            mongodb-org=$MONGO_VERSION \
-            mongodb-org-server=$MONGO_VERSION \
-            mongodb-org-shell=$MONGO_VERSION \
-            mongodb-org-mongos=$MONGO_VERSION \
-            mongodb-org-tools=$MONGO_VERSION \
+### Services for NBSearch
+#### Solr
+# Install OpenJDK and lsyncd
+RUN apt-get update && apt-get install -yq supervisor lsyncd uuid-runtime \
+    openjdk-11-jre gnupg curl tinyproxy \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /home/$NB_USER/.nbsearch/mongodb /opt/nbsearch \
-    && cp /tmp/nbsearch/launch.sh /usr/local/bin/before-notebook.d/nbsearch-launch.sh \
-    && cp /tmp/nbsearch/mongod* /opt/nbsearch/ \
-    && cp /tmp/nbsearch/update-index* /opt/nbsearch/ \
-    && chown $NB_USER -R /home/$NB_USER/.nbsearch \
-    && chmod +x /usr/local/bin/before-notebook.d/nbsearch-launch.sh /opt/nbsearch/update-index
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=solr /opt /opt/
+RUN mkdir -p /var/solr
+COPY --from=solr /var/solr /var/solr
+ENV SOLR_USER="jovyan" \
+    SOLR_GROUP="users" \
+    PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH" \
+    SOLR_INCLUDE=/etc/default/solr.in.sh \
+    SOLR_HOME=/var/solr/data \
+    SOLR_PID_DIR=/var/solr \
+    SOLR_LOGS_DIR=/var/solr/logs \
+    LOG4J_PROPS=/var/solr/log4j2.xml
+RUN chown jovyan:users -R /var/solr
 
-ENV NBSEARCHDB_HOSTNAME=127.0.0.1 NBSEARCHDB_PORT=27017
+#### MINIO
+##### Used for testing purposes only
+ENV MINIO_ACCESS_KEY=nbsearchak MINIO_SECRET_KEY=nbsearchsk \
+    NBSEARCHDB_SOLR_BASE_URL=http://localhost:8983 \
+    NBSEARCHDB_S3_ENDPOINT_URL=http://localhost:9000 \
+    NBSEARCHDB_S3_ACCESS_KEY=nbsearchak NBSEARCHDB_S3_SECRET_KEY=nbsearchsk
+RUN mkdir -p /opt/minio/bin/ && \
+    curl -L https://dl.min.io/server/minio/release/linux-amd64/minio > /opt/minio/bin/minio && \
+    chmod +x /opt/minio/bin/minio && mkdir -p /var/minio && chown jovyan:users -R /var/minio
+
+#### Scripts for NBSearch
+RUN mkdir -p /opt/nbsearch \
+    && git clone -b feature/solr-r1 https://github.com/yacchin1205/nbsearch.git /tmp/nbsearch-git \
+    && cp -fr /tmp/nbsearch-git/solr /opt/nbsearch/ \
+    && cp /tmp/nbsearch/launch.sh /usr/local/bin/before-notebook.d/nbsearch-launch.sh \
+#    && cp /tmp/nbsearch/mongod* /opt/nbsearch/ \
+    && cp /tmp/nbsearch/update-index* /opt/nbsearch/ \
+#    && chown $NB_USER -R /home/$NB_USER/.nbsearch \
+    && chmod +x /usr/local/bin/before-notebook.d/nbsearch-launch.sh /opt/nbsearch/update-index
 
 # Make classic notebook the default
 ENV DOCKER_STACKS_JUPYTER_CMD=notebook
