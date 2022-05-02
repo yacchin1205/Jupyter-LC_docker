@@ -17,6 +17,7 @@ The goals for Literate Computing tools are:
     - nblineage https://github.com/NII-cloud-operation/Jupyter-LC_nblineage
     - index https://github.com/NII-cloud-operation/Jupyter-LC_index
     - sidestickies https://github.com/NII-cloud-operation/sidestickies
+    - nbsearch https://github.com/NII-cloud-operation/nbsearch
 
 ## Basic Use
 
@@ -31,8 +32,22 @@ You can login the Notebook server with the authentication token in the startup m
 If you would like to use [NBSearch](https://github.com/NII-cloud-operation/nbsearch), use MongoDB container like the following:
 
 ```
-docker run -d --rm --name nbsearch-mongodb mongo
-docker run -it --rm --link nbsearch-mongodb:mymongo -e NBSEARCHDB_HOSTNAME=mymongo -p 8888:8888 niicloudoperation/notebook
+# Launch Solr
+git clone -b feature/solr-r1 https://github.com/yacchin1205/nbsearch /tmp/nbsearch
+docker run -d --name nbsearch-solr -v /tmp/nbsearch:/tmp/nbsearch --rm solr:latest \
+    bash -c "precreate-core jupyter-notebook /tmp/nbsearch/solr/jupyter-notebook/ && \
+        precreate-core jupyter-cell /tmp/nbsearch/solr/jupyter-cell/ && \
+        solr-foreground"
+
+# Launch MinIO
+docker run -d --rm -e MINIO_ACCESS_KEY=nbsearchak -e MINIO_SECRET_KEY=nbsearchsk \
+    --name nbsearch-minio minio/minio:latest server /data --compat
+
+# Launch Notebook
+docker run -it --rm --link nbsearch-solr:solr --link nbsearch-minio:minio \
+    -e NBSEARCHDB_SOLR_BASE_URL=http://solr:8983 -e NBSEARCHDB_S3_ENDPOINT_URL=http://minio:9000 \
+    -e NBSEARCHDB_S3_ACCESS_KEY=nbsearchak -e NBSEARCHDB_S3_SECRET_KEY=nbsearchsk \
+    -p 8888:8888 niicloudoperation/notebook
 ```
 
 To enable the NBSearch extension, refer `03_Notebookの検索.ipynb` in the container.
