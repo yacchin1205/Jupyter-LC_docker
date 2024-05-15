@@ -63,8 +63,8 @@ RUN pip --no-cache-dir install folium
 #### Jupyter-LC_index (NII) - https://github.com/NII-cloud-operation/Jupyter-LC_index
 ENV nblineage_release_tag=0.2.0.rc1 \
     nblineage_release_url=https://github.com/NII-cloud-operation/Jupyter-LC_nblineage/releases/download/ \
-    lc_index_release_tag=0.2.0.rc2 \
-    lc_index_release_url=https://github.com/NII-cloud-operation/Jupyter-LC_index/releases/download/ \
+    lc_index_release_tag=0.2.0.test4 \
+    lc_index_release_url=https://github.com/yacchin1205/Jupyter-LC_index/releases/download/ \
     lc_multi_outputs_release_tag=2.2.0.test22 \
     lc_multi_outputs_release_url=https://github.com/yacchin1205/Jupyter-multi_outputs/releases/download/ \
     lc_run_through_release_tag=0.2.0.rc1 \
