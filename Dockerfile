@@ -1,6 +1,6 @@
 FROM solr:8 AS solr
 
-FROM niicloudoperation/notebook:feature_nbsearch-search-cells-magic
+FROM yacchin1205/notebook:feature_nbsearch-search-cells-magic
 
 USER root
 
