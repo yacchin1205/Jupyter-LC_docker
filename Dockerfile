@@ -67,8 +67,8 @@ ENV nblineage_release_tag=0.2.0.rc1 \
     diff_release_url=https://github.com/NII-cloud-operation/Jupyter-LC_notebook_diff/releases/download/ \
     sidestickies_release_tag=0.3.1.rc3 \
     sidestickies_release_url=https://github.com/NII-cloud-operation/sidestickies/releases/download/ \
-#    nbsearch_release_tag=0.2.0.rc2 \
-#    nbsearch_release_url=https://github.com/NII-cloud-operation/nbsearch/releases/download/ \
+    nbsearch_release_tag=0.2.0.test2025063 \
+    nbsearch_release_url=https://github.com/yacchin1205/nbsearch/releases/download/ \
     nbwhisper_release_tag=0.2.0.rc1 \
     nbwhisper_release_url=https://github.com/NII-cloud-operation/nbwhisper/releases/download/
 RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
@@ -81,8 +81,7 @@ RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     ${lc_index_release_url}${lc_index_release_tag}/lc_index-${lc_index_release_tag}.tar.gz \
     ${diff_release_url}${diff_release_tag}/lc_notebook_diff-${diff_release_tag}.tar.gz \
     ${sidestickies_release_url}${sidestickies_release_tag}/sidestickies-${sidestickies_release_tag}.tar.gz \
-#    ${nbsearch_release_url}${nbsearch_release_tag}/nbsearch-${nbsearch_release_tag}.tar.gz \
-    git+https://github.com/yacchin1205/nbsearch.git@feature/search-cells-magic \
+    ${nbsearch_release_url}${nbsearch_release_tag}/nbsearch-${nbsearch_release_tag}.tar.gz \
     ${nbwhisper_release_url}${nbwhisper_release_tag}/nbwhisper-${nbwhisper_release_tag}.tar.gz \
     jupyter-ai[all]
 
