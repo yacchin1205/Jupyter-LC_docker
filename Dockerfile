@@ -1,7 +1,7 @@
 FROM solr:8 AS solr
 
 # yacchin1205/notebook:feature_lab-202506
-FROM yacchin1205/notebook@sha256:b602b8a5e63c2777560f5e28b1490cfee8adbe166fbe8fca0eb23297596d3253
+FROM yacchin1205/notebook@sha256:f30182e415d8cefbff17d1de9dac4af238b7ba5e1f7a67aed4e73927a1cce9fa
 
 USER root
 
@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y expect && \
 
 RUN rm /home/$NB_USER/*.ipynb
 
-RUN pip install jupyter-server-proxy && \
+RUN pip --no-cache-dir install jupyter-server-proxy && \
     jupyter server extension enable --sys-prefix jupyter_server_proxy
 COPY ./nbsearch /tmp/nbsearch
 COPY ./sidestickies /tmp/nbtags
