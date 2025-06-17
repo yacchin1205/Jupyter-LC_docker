@@ -1,6 +1,7 @@
 FROM solr:8 AS solr
 
-FROM yacchin1205/notebook:feature_nbsearch-search-cells-magic
+#FROM yacchin1205/notebook:feature_nbsearch-search-cells-magic
+FROM yacchin1205/notebook@sha256:81f24a3ad08451d0f315860e51e6d285c651bfa46125301eb975b2631bd87a7c
 
 USER root
 
