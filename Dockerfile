@@ -1,7 +1,7 @@
 FROM solr:8 AS solr
 
 # yacchin1205/notebook:feature_lab-202506
-FROM yacchin1205/notebook@sha256:a2425199496192411d15cb4e491634fb54024b8a15a607fae007251671b2055d
+FROM yacchin1205/notebook@sha256:b602b8a5e63c2777560f5e28b1490cfee8adbe166fbe8fca0eb23297596d3253
 
 USER root
 
@@ -33,15 +33,6 @@ RUN mkdir -p /opt/minio/bin/ && \
     chmod +x /opt/minio/bin/minio && mkdir -p /var/minio && chown jovyan:users -R /var/minio
 
 # ep_weave
-# Install nodejs 20
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && \
-    mkdir -p /.npm && \
-    chown jovyan:users -R /.npm && \
-    rm -rf /var/lib/apt/lists/*
-ENV NPM_CONFIG_PREFIX=/.npm
-ENV PATH=/.npm/bin/:${PATH}
 RUN mkdir /opt/etherpad && chown jovyan:users -R /opt/etherpad && \
     chown jovyan:users -R /var/solr /var/log/nginx /var/lib/nginx
 
