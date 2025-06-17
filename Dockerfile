@@ -82,7 +82,8 @@ RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     ${diff_release_url}${diff_release_tag}/lc_notebook_diff-${diff_release_tag}.tar.gz \
     ${sidestickies_release_url}${sidestickies_release_tag}/sidestickies-${sidestickies_release_tag}.tar.gz \
     ${nbsearch_release_url}${nbsearch_release_tag}/nbsearch-${nbsearch_release_tag}.tar.gz \
-    ${nbwhisper_release_url}${nbwhisper_release_tag}/nbwhisper-${nbwhisper_release_tag}.tar.gz
+    ${nbwhisper_release_url}${nbwhisper_release_tag}/nbwhisper-${nbwhisper_release_tag}.tar.gz \
+    jupyter-ai[all]
 
 RUN jupyter nblineage quick-setup --sys-prefix && \
     jupyter nbclassic-extension install --py lc_run_through --sys-prefix && \
