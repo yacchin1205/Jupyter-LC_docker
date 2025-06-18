@@ -26,18 +26,12 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 SHELL ["/bin/bash", "-c"]
 
-### ansible
+### ansible and utilities
 RUN apt-get update && \
-    apt-get -y install sshpass openssl ipmitool libssl-dev libffi-dev && \
+    apt-get -y install sshpass openssl ipmitool libssl-dev libffi-dev virtinst dnsutils zip tree jq rsync iputils-ping && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    conda install --quiet --yes requests paramiko ansible asciinema && \
-    conda clean --all -f -y
-
-### Utilities
-RUN apt-get update && apt-get install -y virtinst dnsutils zip tree jq rsync iputils-ping && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    conda install --quiet --yes papermill && \
-    pip --no-cache-dir install netaddr pyapi-gitlab pysnmp pysnmp-mibs pytest-playwright && \
+    conda install --quiet --yes requests paramiko ansible papermill folium && \
+    pip --no-cache-dir install asciinema netaddr pyapi-gitlab pysnmp pysnmp-mibs pytest-playwright && \
     conda clean --all -f -y
 
 ### Install nodejs 20 for svg-term-cli
@@ -54,8 +48,6 @@ RUN npm install -g svg-term-cli && \
     npm cache clean --force
 USER root
 
-#### Visualization
-RUN pip --no-cache-dir install folium
 
 ### extensions for jupyter
 #### jupyter_nbextensions_configurator
