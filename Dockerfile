@@ -24,7 +24,8 @@ SHELL ["/bin/bash", "-c"]
 
 ### ansible and utilities
 RUN apt-get update && \
-    apt-get -y install sshpass openssl ipmitool libssl-dev libffi-dev virtinst dnsutils zip tree jq rsync iputils-ping lsyncd && \
+    apt-get -y install sshpass openssl ipmitool libssl-dev libffi-dev virtinst dnsutils zip tree jq \
+        rsync iputils-ping lsyncd netcat-traditional && \
     conda install --quiet --yes requests paramiko ansible papermill folium && \
     pip --no-cache-dir install asciinema netaddr pyapi-gitlab pysnmp pysnmp-mibs pytest-playwright && \
     apt-get remove -y libssl-dev libffi-dev && \
@@ -91,7 +92,7 @@ RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     ${sidestickies_release_url}${sidestickies_release_tag}/sidestickies-${sidestickies_release_tag}.tar.gz \
     ${nbsearch_release_url}${nbsearch_release_tag}/nbsearch-${nbsearch_release_tag}.tar.gz \
     ${nbwhisper_release_url}${nbwhisper_release_tag}/nbwhisper-${nbwhisper_release_tag}.tar.gz \
-    jupyter-ai[all] && \
+    jupyter-ai langchain-anthropic langchain-openai langchain-google-genai && \
     pip cache purge && \
     rm -rf /tmp/* /var/tmp/* ~/.cache/* || true
 
