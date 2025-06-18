@@ -28,11 +28,16 @@ SHELL ["/bin/bash", "-c"]
 
 ### ansible and utilities
 RUN apt-get update && \
-    apt-get -y install sshpass openssl ipmitool libssl-dev libffi-dev virtinst dnsutils zip tree jq rsync iputils-ping && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    apt-get -y install sshpass openssl ipmitool libssl-dev libffi-dev virtinst dnsutils zip tree jq rsync iputils-ping lsyncd && \
     conda install --quiet --yes requests paramiko ansible papermill folium && \
     pip --no-cache-dir install asciinema netaddr pyapi-gitlab pysnmp pysnmp-mibs pytest-playwright && \
-    conda clean --all -f -y
+    apt-get remove -y libssl-dev libffi-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    conda clean --all -f -y && \
+    pip cache purge && \
+    rm -rf /tmp/* /var/tmp/* /root/.cache/* || true
 
 ### Install nodejs 20 for svg-term-cli
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
@@ -40,12 +45,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get clean && \
     mkdir -p /.npm && \
     chown jovyan:users -R /.npm && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 ENV NPM_CONFIG_PREFIX=/.npm
 ENV PATH=/.npm/bin/:${PATH}
 USER $NB_USER
 RUN npm install -g svg-term-cli && \
-    npm cache clean --force
+    npm cache clean --force && \
+    rm -rf ~/.npm/_cacache ~/.npm/_logs /tmp/* || true
 USER root
 
 
@@ -89,7 +95,9 @@ RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     ${sidestickies_release_url}${sidestickies_release_tag}/sidestickies-${sidestickies_release_tag}.tar.gz \
     ${nbsearch_release_url}${nbsearch_release_tag}/nbsearch-${nbsearch_release_tag}.tar.gz \
     ${nbwhisper_release_url}${nbwhisper_release_tag}/nbwhisper-${nbwhisper_release_tag}.tar.gz \
-    jupyter-ai[all]
+    jupyter-ai[all] && \
+    pip cache purge && \
+    rm -rf /tmp/* /var/tmp/* ~/.cache/* || true
 
 RUN jupyter nblineage quick-setup --sys-prefix && \
     jupyter nbclassic-extension install --py lc_run_through --sys-prefix && \
@@ -185,19 +193,16 @@ RUN mkdir -p $CONDA_DIR/etc/ipython/startup/ && \
 
 ### Add run-hooks
 RUN mkdir -p /usr/local/bin/before-notebook.d && \
-    cp /tmp/ssh-agent.sh /usr/local/bin/before-notebook.d/
-
-### Install lsyncd for nbsearch
-RUN apt-get update && apt-get install -yq lsyncd \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /opt/nbsearch \
+    cp /tmp/ssh-agent.sh /usr/local/bin/before-notebook.d/ && \
+    mkdir -p /opt/nbsearch \
     && cp /tmp/nbsearch/launch.sh /usr/local/bin/before-notebook.d/nbsearch-launch.sh \
     && cp /tmp/nbsearch/update-index* /opt/nbsearch/ \
     && chmod +x /usr/local/bin/before-notebook.d/nbsearch-launch.sh /opt/nbsearch/update-index
 
 # Workaround for https://github.com/NII-cloud-operation/Jupyter-LC_wrapper/issues/71
-RUN pip install --upgrade jupyter_core==5.6.1
+RUN pip install --upgrade jupyter_core==5.6.1 && \
+    pip cache purge && \
+    rm -rf /tmp/* /var/tmp/* ~/.cache/* || true
 
 # Make classic notebook the default
 #ENV DOCKER_STACKS_JUPYTER_CMD=nbclassic
