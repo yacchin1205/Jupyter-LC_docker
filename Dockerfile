@@ -1,7 +1,7 @@
 FROM solr:8 AS solr
 
 # yacchin1205/notebook:feature_lab-202506
-FROM yacchin1205/notebook@sha256:f30182e415d8cefbff17d1de9dac4af238b7ba5e1f7a67aed4e73927a1cce9fa
+FROM yacchin1205/notebook@sha256:2010637804c06ecf0f9abbc5f757178a8513482b12512f8362534eda1e178762
 
 USER root
 
