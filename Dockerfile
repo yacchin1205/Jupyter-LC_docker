@@ -84,6 +84,10 @@ ENV nblineage_release_tag=0.2.0.rc1 \
     nbwhisper_release_url=https://github.com/NII-cloud-operation/nbwhisper/releases/download/ \
     lc_toc_button_release_tag=0.1.0.rc2 \
     lc_toc_button_release_url=https://github.com/NII-cloud-operation/Jupyter-LC_ToC_button/releases/download/
+
+# Install notebook 7.5.0a2 prerelease first
+RUN pip install --pre --upgrade notebook==7.5.0a2
+
 RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     pip --no-cache-dir install six bash_kernel \
     jupyterlab-language-pack-ja-JP \
