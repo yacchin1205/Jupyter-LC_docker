@@ -1,7 +1,11 @@
-FROM quay.io/jupyter/scipy-notebook:notebook-7.4.5
+FROM quay.io/jupyter/scipy-notebook:notebook-7.4.7
 MAINTAINER https://github.com/NII-cloud-operation
 
 USER root
+
+# Install notebook 7.5.0a2 prerelease first
+RUN pip install --pre --upgrade notebook==7.5.0rc1
+
 # Install tools and fonts
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     git \
@@ -85,9 +89,6 @@ ENV nblineage_release_tag=0.2.0.rc1 \
     lc_toc_button_release_tag=0.1.0.rc2 \
     lc_toc_button_release_url=https://github.com/NII-cloud-operation/Jupyter-LC_ToC_button/releases/download/
 
-# Install notebook 7.5.0a2 prerelease first
-RUN pip install --pre --upgrade notebook==7.5.0a2
-
 RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     pip --no-cache-dir install six bash_kernel \
     jupyterlab-language-pack-ja-JP \
@@ -102,7 +103,7 @@ RUN pip --no-cache-dir install jupyter_nbextensions_configurator && \
     ${nbwhisper_release_url}${nbwhisper_release_tag}/nbwhisper-${nbwhisper_release_tag}.tar.gz \
     ${lc_toc_button_release_url}${lc_toc_button_release_tag}/table_of_contents-${lc_toc_button_release_tag}.tar.gz
 
-RUN pip --no-cache-dir install jupyter-ai[all]==3.0.0b9 jupyter-ai-magics[all]==3.0.0b7
+# RUN pip --no-cache-dir install jupyter-ai[all]==3.0.0b9 jupyter-ai-magics[all]==3.0.0b7
 
 RUN jupyter nblineage quick-setup --sys-prefix && \
     jupyter nbclassic-extension install --py lc_run_through --sys-prefix && \
