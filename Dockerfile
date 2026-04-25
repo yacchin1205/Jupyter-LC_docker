@@ -9,6 +9,10 @@ RUN chown jovyan:users -R /home/$NB_USER/
 ADD sample-pads /pads.d
 RUN chown jovyan:users -R /pads.d
 
+# Verification: uninstall jupyter-mynerva to isolate spawn timeout cause
+RUN pip uninstall -y jupyter_mynerva && \
+    jupyter labextension disable jupyter-mynerva --level=system
+
 USER $NB_USER
 
 RUN find /home/$NB_USER -name "*.ipynb" -exec jupyter trust {} \;
