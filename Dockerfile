@@ -12,6 +12,13 @@ RUN apt-get update && apt-get install -yq supervisor lsyncd uuid-runtime \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Node.js + pnpm (required for ep_weave / etherpad)
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    npm install -g pnpm
+
 # Solr
 COPY --from=solr /opt /opt/
 RUN mkdir -p /var/solr
@@ -43,13 +50,12 @@ ARG ETHERPAD_LOCAL_PLUGINS="/tmp/ep_weave/ /tmp/ep_search/"
 RUN git clone https://github.com/NII-cloud-operation/ep_weave.git /tmp/ep_weave \
     && cd /tmp/ep_weave \
     && ls -la /tmp/ep_weave \
-    && npm i --include dev && npm run build
+    && pnpm install && pnpm run build
 RUN git clone -b feature/search-engine https://github.com/NII-cloud-operation/ep_search.git /tmp/ep_search \
     && cd /tmp/ep_search \
     && ls -la /tmp/ep_search \
-    && npm pack
-RUN npm install -g pnpm && \
-    git clone -b develop https://github.com/ether/etherpad-lite.git /opt/etherpad/ && \
+    && pnpm pack
+RUN git clone -b develop https://github.com/ether/etherpad-lite.git /opt/etherpad/ && \
     cd /opt/etherpad && \
     pnpm i && \
     pnpm run build:etherpad && \
