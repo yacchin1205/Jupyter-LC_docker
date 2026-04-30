@@ -1,7 +1,7 @@
 FROM solr:8 AS solr
 
 # niicloudoperation/notebook:feature-lab
-FROM niicloudoperation/notebook@sha256:8e70c90ee7ad046f752a7493c8f084fd3e51345c0748f9516c8765a3c87122d5
+FROM niicloudoperation/notebook@sha256:27cd79c9fbe1d8e7143b9531cd704c904724274ca98a1cbfd738e1bc5051e957
 
 USER root
 
@@ -125,7 +125,6 @@ RUN jupyter labextension enable sidestickies --level=system && \
 RUN cp /tmp/conf/etherpad-settings.json /opt/etherpad/settings.json
 
 USER $NB_USER
-RUN jupyter nbclassic-extension enable --py --user nbtags
 
 # for sidestickies -->
 
@@ -137,9 +136,4 @@ RUN precreate-core jupyter-notebook /opt/nbsearch/solr/jupyter-notebook/ && \
     precreate-core jupyter-cell /opt/nbsearch/solr/jupyter-cell/ && \
     precreate-core pad /tmp/ep_weave/solr/pad/
 
-RUN jupyter nbclassic-serverextension enable --py --user nbsearch && \
-    jupyter nbclassic-extension enable --py --user nbsearch && \
-    jupyter nbclassic-serverextension enable --py --user nbtags && \
-    jupyter nbclassic-extension enable --py --user nbtags && \
-    jupyter nbclassic-extension enable --py --user lc_notebook_diff
 # <-- for nbsearch
