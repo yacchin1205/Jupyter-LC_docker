@@ -174,6 +174,10 @@ RUN apt-get update && apt-get install -yq lsyncd \
 RUN ARCH=$(dpkg --print-architecture) && \
     curl -fL ${nblibram_release_url}${nblibram_release_tag}/nblibram_linux_${ARCH}.tar.gz | tar xz -C /usr/local/bin/
 
+### Remove build dependencies inherited from the base image
+RUN apt-get purge -y --auto-remove build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 # Make classic notebook the default
 #ENV DOCKER_STACKS_JUPYTER_CMD=nbclassic
 
